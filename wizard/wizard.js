@@ -110,6 +110,49 @@ function inventory () {
 
 //게임 엔진에 직접 만든 인터페이스 추가하기
 //직접 만드는 REPL
+
+var read = require('read');
+
 function game_repl () {
-    while (true) {
-	
+    read({}, function (err, cmd) {
+	console.log(eval(cmd));
+	game_repl();
+    });
+}
+
+//종료 기능을 추가
+function game_repl () {
+    game_read(function (cmd) {
+	if (cmd != 'quit()') {
+	    console.log(game_eval(cmd));
+	    game_repl();
+	}
+    });
+}
+
+//read 함수 직접 작성하기
+function game_read (callback) {
+    read({}, function (err, cmd) {
+	cmd = cmd.split(" ");
+	if (cmd.length > 1) {
+	    cmd = cmd[0] + "('" + cmd.splice(1).join(" ") + "')";
+	}
+	else {
+	    cmd = cmd[0] + "()";
+	}
+	callback(cmd);
+    });
+}
+
+allowed_commands = ['look', 'walk', 'pickup', 'inventory'];
+
+function game_eval (sexp) {
+    if (member(sexp.split("(")[0], allowed_commands)) {
+	return eval(sexp);
+    }
+    else {
+	return "I do not know that command.";
+    }
+};
+
+game_repl();
