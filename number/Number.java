@@ -5,10 +5,12 @@ public class Number {
     private static int small = 1;
     private static int big = 100;
 
+    // guess-my-number 함수 정의하기
     private static int guess_my_number() {
 	return small + big >> 1;
     }
 
+    // smaller와 bigger 함수 정의하기
     private static int smaller() {
 	big = guess_my_number() - 1;
 	return guess_my_number();
@@ -19,6 +21,7 @@ public class Number {
 	return guess_my_number();
     }
 
+    // start-over 함수 정의하기
     private static int start_over() {
 	small = 1;
 	big = 100;
