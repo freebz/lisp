@@ -85,7 +85,7 @@ end
 #무향 그래프 생성하기
 def uedges_to_dot (edges)
   lst = edges.keys
-  while lst.length > 0 do
+  until lst.empty? do
     key = lst.shift
     edges[key].each do |edge|
       if not lst.include? edge[0] then
