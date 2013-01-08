@@ -51,13 +51,13 @@ def look ():
 
 #게임 세계 둘러보기
 def walk (direction):
+    global location
     result = None
     for edge in edges[location]:
         if edge[1] == direction:
             result = edge
             break
     if result:
-        global location
         location = result[0]
         return look()
     else:
@@ -113,3 +113,7 @@ def member (list, value):
         if item == value:
             return True
     return False
+
+
+if __name__ == '__main__':
+    game_repl()
