@@ -127,3 +127,6 @@ def game_eval (sexp)
 end
 
 #game-print 함수 작성하기
+
+
+game_repl()
