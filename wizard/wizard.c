@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFFER_SIZE	1000
+
 //장소 묘사하기
 typedef struct {
   const char *location;
@@ -15,13 +17,18 @@ const Node nodes[] = {
   {NULL, NULL}
 };
 
-const char *describe_location(const char *location, const Node nodes[]) {
+char *describe_location(const char *location, const Node nodes[]) {
   int i;
+  char temp[BUFFER_SIZE] = "";
   for (i=0; nodes[i].location != NULL; i++) {
     if(strcmp(location, nodes[i].location) == 0) {
-      return nodes[i].desc;
+      strcpy(temp, nodes[i].desc);
+      break;
     }
   }
+  char *ret = (char *) malloc(strlen(temp) * sizeof(char));
+  strcpy(ret, temp);
+  return ret;
 }
 
 //경로 묘사하기
@@ -38,23 +45,23 @@ const Edge edges[] = {
   {NULL, {NULL, NULL, NULL}}
 };
 
-void describe_path(char **ret, const char* const edge[])
+char *describe_path( const char* const edge[])
 {
-  char temp[1000] = "";
+  char temp[BUFFER_SIZE] = "";
   sprintf(temp, "There is %s going %s from here.", edge[2], edge[1]);
-  *ret = (char *)malloc(strlen(temp) * sizeof(char));
-  strcpy(*ret, temp);
+  char *ret = (char *)malloc(strlen(temp) * sizeof(char));
+  strcpy(ret, temp);
+  return ret;
 }
 
 //한 번에 여러 경로 정의하기
-void describe_paths(char **ret, const char *location, const Edge edges[])
+char *describe_paths(const char *location, const Edge edges[])
 {
   int i;
-  char temp[1000] = "";
-  char *buf;
+  char temp[BUFFER_SIZE] = "";
   for (i=0; edges[i].location != NULL; i++) {
     if(strcmp(location, edges[i].location) == 0) {
-      describe_path(&buf, edges[i].edge);
+      char *buf = describe_path(edges[i].edge);
       if(i == 0){
 	strcpy(temp, buf);
       }
@@ -65,8 +72,9 @@ void describe_paths(char **ret, const char *location, const Edge edges[])
       free(buf);
     }
   }
-  *ret = (char *)malloc(strlen(temp) * sizeof(char));
-  strcpy(*ret, temp);
+  char *ret = (char *)malloc(strlen(temp) * sizeof(char));
+  strcpy(ret, temp);
+  return ret;
 }
 
 //특정 장소의 물건 설명하기
@@ -86,9 +94,9 @@ const ObjectLocation object_locations[] = {
   {NULL, NULL}
 };
 
-void objects_at(const char ***ret, const char *loc, const char *objs[], const ObjectLocation obj_locs[]) {
+const char **objects_at(const char *loc, const char *objs[], const ObjectLocation obj_locs[]) {
   int i, j, ret_size = 0;
-  const char *temp[1000];
+  const char *temp[BUFFER_SIZE];
   for (i=0; objs[i] != NULL; i++) {
     for (j=0; obj_locs[j].object != NULL; j++) {
       if(strcmp(objs[i], obj_locs[j].object) == 0
@@ -98,19 +106,20 @@ void objects_at(const char ***ret, const char *loc, const char *objs[], const Ob
     }
   }
   temp[ret_size++] = NULL;
-  *ret = (const char **)malloc(ret_size * sizeof(const char **));
+  const char **ret = (const char **)malloc(ret_size * sizeof(const char *));
   for (i=0; i<ret_size; i++) {
-    (*ret)[i] = temp[i];
+    ret[i] = temp[i];
   }
+  return ret;
 }
 
 //눈에 보이는 물건 묘사하기
-void describe_objects(char **ret, const char *loc, const char *objs[], const ObjectLocation obj_locs[])
+char *describe_objects(const char *loc, const char *objs[], const ObjectLocation obj_locs[])
 {
   int i;
-  char temp[1000] = "";
+  char temp[BUFFER_SIZE] = "";
   const char **buf;
-  objects_at(&buf, loc, objs, obj_locs);
+  buf = objects_at(loc, objs, obj_locs);
   for(i=0; buf[i] != NULL; i++) {
     if (i == 0) {
       sprintf(temp, "You see a %s on the floor.", buf[i]);
@@ -120,93 +129,94 @@ void describe_objects(char **ret, const char *loc, const char *objs[], const Obj
     }
   }
   free(buf);
-  *ret = (char *)malloc(strlen(temp) * sizeof(char *));
-  strcpy(*ret, temp);
+  char *ret = (char *)malloc(strlen(temp) * sizeof(char));
+  strcpy(ret, temp);
+  return ret;
 }
 
 //전부 출력하기
-char location[1000] = "living-room";
+char location[BUFFER_SIZE] = "living-room";
 
-void look(char **ret)
+char *look()
 {
-  char temp[1000] = "";
-  const char *node;
-  char *paths, *objs;
+  char temp[BUFFER_SIZE] = "";
+  char *buf;
+  buf = describe_location(location, nodes);
+  strcpy(temp, buf);
+  free(buf);
   
-  node = describe_location(location, nodes);
-  describe_paths(&paths, location, edges);  
-  describe_objects(&objs, location, objects, object_locations);
-  
-  strcpy(temp, node);
+  buf = describe_paths(location, edges);  
   strcat(temp, " ");
-  strcat(temp, paths);
+  strcat(temp, buf);
+  free(buf);
+  
+  buf = describe_objects(location, objects, object_locations);
   strcat(temp, " ");
-  strcat(temp, objs);
-  
-  free(paths);
-  free(objs);
-  
-  *ret = (char *)malloc(strlen(temp) * sizeof(char *));
-  strcpy(*ret, temp);
+  strcat(temp, buf);
+  free(buf);
+    
+  char *ret = (char *)malloc(strlen(temp) * sizeof(char));
+  strcpy(ret, temp);
+  return ret;
 }
 
 //게임 세계 둘러보기
-void walk(char **ret, const char *direction)
+char *walk(const char *direction)
 {
   int i;
   for (i=0; edges[i].location != NULL; i++) {
     if (strcmp(edges[i].location, location) == 0
 	&& strcmp(edges[i].edge[1], direction) == 0) {
-      printf("%s\n", location);
-      strcpy(location, edges[i].location);
-      printf("%s\n", location);
-      look(ret);
-      return;
+      strcpy(location, edges[i].edge[0]);
+      return look();
     }
   }
   char *fail = "You cannot go that way.";
-  *ret = (char *)malloc(strlen(fail) * sizeof(char *));
-  strcpy(*ret, fail);
+  char *ret = (char *)malloc(strlen(fail) * sizeof(char));
+  strcpy(ret, fail);
+  return ret;
+}
+
+//물건 집기
+void pickup(const char *object)
+{
 }
 
 void main()
 {
   int i;
-  const char *c_ret;
   char *ret;
   const char **cp_ret;
   
-  
-  c_ret = describe_location("living-room", nodes);
-  printf("%s\n", c_ret);
+  ret = describe_location("living-room", nodes);
+  printf("%s\n", ret);
+  free(ret);
 
   const char* edge[] = {"garden", "west", "door"};
-  describe_path(&ret, edge);
+  ret = describe_path(edge);
   printf("%s\n", ret);
   free(ret);
 
-  describe_paths(&ret, "living-room", edges);
+  ret = describe_paths("living-room", edges);
   printf("%s\n", ret);
   free(ret);
 
-  objects_at(&cp_ret, "living-room", objects, object_locations);
+  cp_ret = objects_at("living-room", objects, object_locations);
   for (i=0; cp_ret[i] != NULL; i++) {
     printf("%s ", cp_ret[i]);
   }
   printf("\n");
   free(cp_ret);
 
-  describe_objects(&ret, "living-room", objects, object_locations);
+  ret = describe_objects("living-room", objects, object_locations);
+  printf("%s\n", ret);
+  free(ret);
+  
+  ret = look();
   printf("%s\n", ret);
   free(ret);
 
-  look(&ret);
+  ret = walk("west");
   printf("%s\n", ret);
   free(ret);
-
- 
-  walk(&ret, "west");
-  printf("%s\n", ret);
-  free(ret);
-
  }
