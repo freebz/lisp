@@ -11,12 +11,13 @@ typedef struct {
 const Node nodes[] = {
   {"living-room", "You are in the living-room. A wizard is snoring loudly on the couch."},
   {"garden", "You are in a beautiful garden. There is a well in front of you."},
-  {"attic", "You are in the attic. There is a giant welding torch in the corner."}
+  {"attic", "You are in the attic. There is a giant welding torch in the corner."},
+  {NULL, NULL}
 };
 
-const char *describe_location(const char *location, const Node nodes[], const size) {
+const char *describe_location(const char *location, const Node nodes[]) {
   int i;
-  for (i=0; i<size; i++) {
+  for (i=0; nodes[i].location != NULL; i++) {
     if(strcmp(location, nodes[i].location) == 0) {
       return nodes[i].desc;
     }
@@ -33,7 +34,8 @@ const Edge edges[] = {
   {"living-room", {"garden", "west", "door"}},
   {"living-room", {"attic", "upstairs", "ladder"}},
   {"garden", {"living-room", "east", "door"}},
-  {"attic", {"living-room", "downstairs", "ladder"}}
+  {"attic", {"living-room", "downstairs", "ladder"}},
+  {NULL, {NULL, NULL, NULL}}
 };
 
 char *describe_path(const char* const edge[])
@@ -47,11 +49,11 @@ char *describe_path(const char* const edge[])
 }
 
 //한 번에 여러 경로 정의하기
-char *describe_paths(const char *location, const Edge edges[], const size)
+char *describe_paths(const char *location, const Edge edges[])
 {
   int i;
   char temp[1000] = "";
-  for (i=0; i<size; i++) {
+  for (i=0; edges[i].location != NULL; i++) {
     if(strcmp(location, edges[i].location) == 0) {
       char *buf = describe_path(edges[i].edge);
       if(i == 0){
@@ -71,7 +73,7 @@ char *describe_paths(const char *location, const Edge edges[], const size)
 
 //특정 장소의 물건 설명하기
 //눈에 보이는 물건 나열하기
-const char *objects[] = {"whiskey", "bucket", "frog", "chain"};
+const char *objects[] = {"whiskey", "bucket", "frog", "chain", NULL};
 
 typedef struct {
   const char *object;
@@ -82,15 +84,15 @@ const ObjectLocation object_locations[] = {
   {"whiskey", "living-room"},
   {"bucket", "living-room"},
   {"chain", "garden"},
-  {"frog", "garden"}
+  {"frog", "garden"},
+  {NULL, NULL}
 };
 
-const char **objects_at(const char *loc, const char *objs[], const objs_size,
-		const ObjectLocation obj_locs[], const obj_locs_size) {
+const char **objects_at(const char *loc, const char *objs[], const ObjectLocation obj_locs[]) {
   int i, j, ret_size = 1;
   const char **ret = (const char **)malloc(ret_size * sizeof(const char *));
-  for (i=0; i<objs_size; i++) {
-    for (j=0; j<obj_locs_size; j++) {
+  for (i=0; objs[i] != NULL; i++) {
+    for (j=0; obj_locs[j].object != NULL; j++) {
       if(strcmp(objs[i], obj_locs[j].object) == 0
 	 && strcmp(loc, obj_locs[j].location) == 0) {
 	ret = (const char **)realloc(ret, (ret_size + 1) *sizeof(const char *));
@@ -104,12 +106,11 @@ const char **objects_at(const char *loc, const char *objs[], const objs_size,
 }
 
 //눈에 보이는 물건 묘사하기
-char *describe_objects(const char *loc, const char *objs[], const objs_size,
-		      const ObjectLocation obj_locs[], const obj_locs_size)
+char *describe_objects(const char *loc, const char *objs[], const ObjectLocation obj_locs[])
 {
   int i;
   char temp[1000] = "";
-  const char **buf = objects_at(loc, objs, objs_size, obj_locs, obj_locs_size);
+  const char **buf = objects_at(loc, objs, obj_locs);
   for(i=0; buf[i] != NULL; i++) {
     if (i == 0) {
       sprintf(temp, "You see a %s on the floor.", buf[i]);
@@ -129,10 +130,9 @@ char location[100] = "living-room";
 
 char *look()
 {
-  const char *node = describe_location(location, nodes, sizeof(nodes)/sizeof(nodes[0]));
-  char *path = describe_paths(location, edges, sizeof(edges)/sizeof(edges[0]));  
-  char *objs = describe_objects(location, objects, sizeof(objects)/sizeof(objects[0]),
-				 object_locations, sizeof(object_locations)/sizeof(object_locations[0]));
+  const char *node = describe_location(location, nodes);
+  char *path = describe_paths(location, edges);  
+  char *objs = describe_objects(location, objects, object_locations);
 
   int ret_size = strlen(node) + strlen(path) + strlen(objs) + 2;
   char *ret = (char *)malloc(ret_size * sizeof(char));
