@@ -121,4 +121,5 @@
 		 'string))
   (fresh-line))
 
-      
+;REPL ½ÇÇà
+(game-repl)

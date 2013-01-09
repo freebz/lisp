@@ -15,18 +15,19 @@ $wizard_edges = {
 #DOT 정보 생성하기
 #노드 식별자 변환하기
 def dot_name (exp)
-  exp.to_s.split(//).map{|byte| byte.sub(/\W/, "_")}.join
+  exp = exp.to_s
+  exp.gsub(/\W/, "_")
 end
 
 #그래프 노드에 이름표 추가하기
 $max_label_length = 30
 
 def dot_label (exp)
-  s = exp.to_s
-  if s.length > $max_label_length then
-    s[0, $max_label_length - 3] + "..."
+  exp = exp.to_s
+  if exp.length > $max_label_length then
+    exp[0, $max_label_length - 3] + "..."
   else
-    s
+    exp
   end
 end
 
@@ -36,27 +37,27 @@ def nodes_to_dot (nodes)
     print dot_name key
     print "[label=\""
     print dot_label node
-    print "\"];\n"
+    puts "\"];"
   }
 end
 
 #에지를 DOT포맷으로 변환하기
 def edges_to_dot (edges)
   edges.map{|nodeKey, node|
-    node.map{|edgeKey, edge|
+    node.map{|edge|
       print dot_name nodeKey
       print "->"
-      print dot_name edgeKey
+      print dot_name edge[0]
       print "[label=\""
-      print dot_label edge
-      print "\"];\n"
+      print dot_label edge[1..-1].join(" ")
+      puts "\"];"
     }
   }
 end
 
 #모든 DOT 데이터 생성하기
 def graph_to_dot (nodes, edges)
-  puts "digraph{"
+  print "digraph{"
   nodes_to_dot nodes
   edges_to_dot edges
   print "}"

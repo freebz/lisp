@@ -280,7 +280,6 @@ char *game_eval(const Command *command)
   int i;
   for (i=0; allowed_command[i].cmd != NULL; i++) {
     if(strcmp(command->cmd, allowed_command[i].cmd) == 0) {
-      //eval
       if(allowed_command[i].param == 1) {
 	return ((char*(*)(const char*))allowed_command[i].fn)(command->param);
       }
