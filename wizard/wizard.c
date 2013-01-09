@@ -83,10 +83,10 @@ const char *objects[] = {"whiskey", "bucket", "frog", "chain", NULL};
 
 typedef struct {
   const char *object;
-  const char *location;
+  char *location;
 } ObjectLocation;
 
-const ObjectLocation object_locations[] = {
+ObjectLocation object_locations[] = {
   {"whiskey", "living-room"},
   {"bucket", "living-room"},
   {"chain", "garden"},
@@ -118,8 +118,7 @@ char *describe_objects(const char *loc, const char *objs[], const ObjectLocation
 {
   int i;
   char temp[BUFFER_SIZE] = "";
-  const char **buf;
-  buf = objects_at(loc, objs, obj_locs);
+  const char **buf = objects_at(loc, objs, obj_locs);
   for(i=0; buf[i] != NULL; i++) {
     if (i == 0) {
       sprintf(temp, "You see a %s on the floor.", buf[i]);
@@ -178,45 +177,132 @@ char *walk(const char *direction)
 }
 
 //물건 집기
-void pickup(const char *object)
+char *pickup(const char *object)
 {
+  int i, j;
+  char temp[BUFFER_SIZE] = "";
+  const char **buf = objects_at(location, objects, object_locations);
+  for (i=0; buf[i] != NULL; i++) {
+    if(strcmp(object, buf[i]) == 0) {
+      for (j=0; object_locations[j].object != NULL; j++) {
+	if(strcmp(location, object_locations[j].location) == 0) {
+	  object_locations[j].location = "body";
+	  sprintf(temp, "You are now carrying the %s", object);
+	  goto escapeLoop;
+	}
+      }
+    }
+  }
+  strcpy(temp, "You cannot get that.");
+ escapeLoop:
+  free(buf);
+  char *ret = (char *) malloc(strlen(temp) * sizeof(char));
+  strcpy(ret, temp);
+  return ret;
+}
+
+//보관함 확인하기
+char *inventory()
+{
+  int i;
+  char temp[BUFFER_SIZE] = "items-";
+  for (i=0; object_locations[i].object != NULL; i++) {
+    if(strcmp(object_locations[i].location, "body") == 0) {
+      strcat(temp, " ");
+      strcat(temp, object_locations[i].object);
+    }
+  }
+  char *ret = (char *) malloc(strlen(temp) * sizeof(char));
+  strcpy(ret, temp);
+  return ret;
+}
+
+//게임 엔진에 직접 만든 인터페이스 추가하기
+//직접 만드는 REPL
+//종료 기능을 추가
+typedef struct {
+  char cmd[BUFFER_SIZE];
+  char param[BUFFER_SIZE];
+} Command;
+
+void game_read(Command *);
+char *game_eval(const Command *);
+void game_print(char*);
+
+void game_repl()
+{
+  Command command;
+  while(1) {
+    game_read(&command);
+    if (strcmp(command.cmd, "quit") == 0) {
+      break;
+    }
+    else {
+      game_print(game_eval(&command));
+    }
+  }
+}
+
+//read 함수 직접 작성하기
+void game_read(Command *command)
+{
+  char cmd[BUFFER_SIZE];
+  gets(cmd);
+
+  char *p = strchr(cmd, ' ');
+  if (p != NULL) {
+    strncpy(command->cmd, cmd, p - cmd);
+    strcpy(command->param, ++p);
+  }
+  else {
+    strcpy(command->cmd, cmd);
+    strcpy(command->param, "");
+  }
+}
+
+//game-eval 함수 작성하기
+typedef struct {
+  const char *cmd;
+  const void *fn;
+  const int param;
+} AllowedCommand;
+
+const AllowedCommand allowed_command[] = {
+  {"look", look, 0},
+  {"walk", walk, 1},
+  {"pickup", pickup, 1},
+  {"inventory", inventory, 0},
+  {NULL, NULL, 0}
+};
+
+char *game_eval(const Command *command)
+{
+  int i;
+  for (i=0; allowed_command[i].cmd != NULL; i++) {
+    if(strcmp(command->cmd, allowed_command[i].cmd) == 0) {
+      //eval
+      if(allowed_command[i].param == 1) {
+	return ((char*(*)(const char*))allowed_command[i].fn)(command->param);
+      }
+      else {
+	return ((char*(*)())allowed_command[i].fn)();
+      }
+    }
+  }
+  char *fail = "I do not know that command.";
+  char *ret = (char *) malloc(strlen(fail) * sizeof(char));
+  strcpy(ret, fail);
+  return ret;
+}
+
+//game-print 함수 작성하기
+void game_print(char *result)
+{
+  printf("%s\n", result);
+  free(result);
 }
 
 void main()
 {
-  int i;
-  char *ret;
-  const char **cp_ret;
-  
-  ret = describe_location("living-room", nodes);
-  printf("%s\n", ret);
-  free(ret);
-
-  const char* edge[] = {"garden", "west", "door"};
-  ret = describe_path(edge);
-  printf("%s\n", ret);
-  free(ret);
-
-  ret = describe_paths("living-room", edges);
-  printf("%s\n", ret);
-  free(ret);
-
-  cp_ret = objects_at("living-room", objects, object_locations);
-  for (i=0; cp_ret[i] != NULL; i++) {
-    printf("%s ", cp_ret[i]);
-  }
-  printf("\n");
-  free(cp_ret);
-
-  ret = describe_objects("living-room", objects, object_locations);
-  printf("%s\n", ret);
-  free(ret);
-  
-  ret = look();
-  printf("%s\n", ret);
-  free(ret);
-
-  ret = walk("west");
-  printf("%s\n", ret);
-  free(ret);
- }
+  game_repl();
+}
