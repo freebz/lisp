@@ -92,13 +92,13 @@ nodes = {'living-room': 'you are in the living-room. a wizard is snoring loudly 
 Java
 </p>
 <pre><code>//관련 풍경 묘사하기
-    private static HashMap<String, String> nodes = new HashMap<String, String>() {
-	{
-	    put("living-room", "You are in the living-room. A wizard is snoring loudly on the couch.");
-	    put("garden", "You are in a beautiful garden. There is a well in front of you.");
-	    put("attic", "You are in the attic. There is a giant welding torch in the corner.");
-	}		      		
-    };
+private static HashMap&lt;String, String&gt; nodes = new HashMap&lt;String, String&gt;() {
+  {
+    put("living-room", "You are in the living-room. A wizard is snoring loudly on the couch.");
+    put("garden", "You are in a beautiful garden. There is a well in front of you.");
+    put("attic", "You are in the attic. There is a giant welding torch in the corner.");
+  }		      		
+};
 </code></pre>
 
 <p>
@@ -181,9 +181,9 @@ function describe_location (location, nodes) {
 Java
 </p>
 <pre><code>// 장소 묘사하기
-    private static String describe_location(String location, HashMap&lt;String, String&gt;nodes) {
+private static String describe_location(String location, HashMap&lt;String, String&gt;nodes) {
 	return nodes.get(location);
-    }
+}
 </code></pre>
 
 <p>
