@@ -71,5 +71,33 @@ def graph_to_png (fname, nodes, edges):
     dot_to_png(fname, lambda:
                graph_to_dot(nodes, edges))
 
+#무향 그래프 생성하기
+def uedges_to_dot (edges):
+    keys = list(edges.keys())
+    while len(keys) > 0:
+        key = keys.pop(0)
+        for edge in edges[key]:
+            if not member(edge[0], keys):
+                sys.stdout.write(dot_name(key))
+                sys.stdout.write("--")
+                sys.stdout.write(dot_name(edge[0]))
+                sys.stdout.write("[label=\"")
+                sys.stdout.write(dot_label(" ".join(edge[1:])))
+                print("\"];")
 
+def ugraph_to_dot (nodes, edges):
+    sys.stdout.write("graph{")
+    nodes_to_dot(nodes)
+    uedges_to_dot(edges)
+    sys.stdout.write("}")
+
+def ugraph_to_png (fname, nodes, edges):
+    dot_to_png(fname, lambda:
+               ugraph_to_dot(nodes, edges))
     
+def member (obj, items):
+    for item in items:
+        if item == obj:
+            return True
+    return False
+
