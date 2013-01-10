@@ -20,7 +20,7 @@
     <header>
       <div class="inner">
         <h1>Wizard</h1>
-        <h2>Lisp 학습을 위한 소스 및 Ruby, Python, Javascript, Perl 등 다른 언어로 포팅 작업</h2>
+        <h2>Text 어드벤처게임 Wizard</h2>
         <a href="https://github.com/freebz/lisp" class="button"><small>View project on</small>GitHub</a>
       </div>
     </header>
@@ -28,32 +28,186 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h3>Lisp의 세계의 오신것을 환영합니다.</h3>
+          <h3>관련 풍경 묘사하기</h3>
 
-<p>이 페이지는 Lisp 프로그래밍을 학습하면서 Ruby, Python, Perl, Java, Javascript, C등 다른 프로그래밍 언어와 Lisp를 비교하며, 장단점과 차이점을 이해하기 위한 용도로 작성되었습니다.</p>
+<p>
+우선 노드를 정의한다. 가능한 해시또는 리스트 구조를 이용해서 정의한다.<br />
+Lisp, Ruby, Python, JavaScript 등은 비교적 쉽게 정의 할 수 있지만,
+Java와 C는 정의하는데 좀 손이 많이 간다.
+</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p>
+Lisp
+</p>
+<pre><code>;관련 풍경 묘사하기
+(defparameter *nodes* '((living-room (you are in the living-room.
+				      a wizard is snoring loudly on the couch.))
+			 (garden (you are in a beautiful garden.
+				      there is a well in front of you.))
+			 (attic (you are in the attic.
+				     there is a giant welding torch in the corner.))))
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>
+Ruby
+</p>
+<pre><code>#관련 풍경 묘사하기
+$nodes = {
+  :living_room => :"you are in the living-room.
+a wizard is snoring loudly on the couch.",
+  :garden => :"you are in a beautiful garden.
+there is a well in front of you.",
+  :attic => :"you are in the attic.
+there is a giant welding torch in the corner."}
+</code></pre>
 
-<h3>Designer Templates</h3>
+<p>
+Python
+</p>
+<pre><code>#관련 풍경 묘사하기
+nodes = {'living-room': "you are in the living-room. a wizard is snoring loudly on the couch.",
+         'garden': "you are in a beautiful garden. there is a well in front of you.",
+         'attic': "you are in the attic. there is a giant welding torch in the corner."}
+</code></pre>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>
+Perl
+</p>
+<pre><code>#관련 풍경 묘사하기
+%nodes = ("living-room" => "You are in the living-room. a wizard is snoring loudly on the couch.",
+	  garden => "You are in a beautiful garden. there is a well in front of you.",
+	  attic => "You are in the attic. there is a giant welding torch in the corner.");
+</code></pre>
 
-<h3>Rather Drive Stick?</h3>
+<p>
+JavaScript
+</p>
+<pre><code>//관련 풍경 묘사하기
+nodes = {'living-room': 'you are in the living-room. a wizard is snoring loudly on the couch.',
+	 garden: 'you are in a beautiful garden. there is a well in front of you.',
+	 attic: 'you are in the attic. there is a giant welding torch in the corner.'};
+</code></pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>
+Java
+</p>
+<pre><code>//관련 풍경 묘사하기
+    private static HashMap<String, String> nodes = new HashMap<String, String>() {
+	{
+	    put("living-room", "You are in the living-room. A wizard is snoring loudly on the couch.");
+	    put("garden", "You are in a beautiful garden. There is a well in front of you.");
+	    put("attic", "You are in the attic. There is a giant welding torch in the corner.");
+	}		      		
+    };
+</code></pre>
 
-<h3>Authors and Contributors</h3>
+<p>
+C
+</p>
+<pre><code>//관련풍경 묘사하기
+typedef struct {
+  const char *location;
+  const char *desc;
+} Node;
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+const Node nodes[] = {
+  {"living-room", "You are in the living-room. A wizard is snoring loudly on the couch."},
+  {"garden", "You are in a beautiful garden. There is a well in front of you."},
+  {"attic", "You are in the attic. There is a giant welding torch in the corner."},
+  {NULL, NULL}
+};
+</code></pre>
 
-<h3>Support or Contact</h3>
+<p></p>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+
+
+<h3>장소 묘사하기</h3>
+
+<p>
+다음은 장소를 묘사하는 코드를 보자, 해시로 저장된 노드에서 값을 읽어오기만 하는 간단한 코드이다.<br />
+해시를 지원하는 모든 언어가 간단하게 구현되지만, 배열로 처리한 C는 루프를 돌기 때문에  코드가 복잡해졌다.
+노드가 많아지면 속도향상을 위해서 순차적인 배열접근이 아닌 해시로 구현해야 한다.
+
+설명은 변경되지 않으므로 const char* 형으로 바로 리턴해도 되지만, 다른 함수들과 같은 로직으로 처리하기 위하여
+동적 메모리를 할당하여 char * 형으로 반환하였다.
+</p>
+
+<p>
+Lisp
+</p>
+<pre><code>;장소 묘사하기
+(defun describe-location (location nodes)
+  (cadr (assoc location nodes)))
+</code></pre>
+
+<p>
+Ruby
+</p>
+<pre><code>#장소 묘사하기
+def describe_location (location, nodes)
+  nodes[location]
+end
+</code></pre>
+
+<p>
+Python
+</p>
+<pre><code>#장소 묘사하기
+def describe_location (location, nodes):
+    return nodes[location]
+</code></pre>
+
+<p>
+Perl
+</p>
+<pre><code>#장소 묘사하기
+sub describe_location {
+    my($location, %nodes) = @_;
+    $nodes{$location};
+}
+</code></pre>
+
+<p>
+JavaScript
+</p>
+<pre><code>//장소 묘사하기
+function describe_location (location, nodes) {
+    return nodes[location];
+}
+</code></pre>
+
+<p>
+Java
+</p>
+<pre><code>// 장소 묘사하기
+    private static String describe_location(String location, HashMap&lt;String, String&gt;nodes) {
+	return nodes.get(location);
+    }
+</code></pre>
+
+<p>
+C
+</p>
+<pre><code>//장소 묘사하기
+char *describe_location(const char *location, const Node nodes[]) {
+  int i;
+  char temp[BUFFER_SIZE] = "";
+  for (i=0; nodes[i].location != NULL; i++) {
+    if(strcmp(location, nodes[i].location) == 0) {
+      strcpy(temp, nodes[i].desc);
+      break;
+    }
+  }
+  char *ret = (char *) malloc(strlen(temp) * sizeof(char));
+  strcpy(ret, temp);
+  return ret;
+}
+</code></pre>
+
+
+
+
         </section>
 
         <aside id="sidebar">
