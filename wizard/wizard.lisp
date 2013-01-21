@@ -74,8 +74,8 @@
 
 ;게임 엔진에 직접 만든 인터페이스 추가하기
 ;직접 만드는 REPL
-(defun game-repl ()
-  (loop (print (eval (read)))))
+;(defun game-repl ()
+;  (loop (print (eval (read)))))
 
 ;종료 기능을 추가
 (defun game-repl ()

@@ -1,13 +1,13 @@
-#ê´€ë ¨ í’ê²½ ë¬˜ì‚¬í•˜ê¸°
+#°ü·Ã Ç³°æ ¹¦»çÇÏ±â
 nodes = {'living-room': "you are in the living-room. a wizard is snoring loudly on the couch.",
          'garden': "you are in a beautiful garden. there is a well in front of you.",
          'attic': "you are in the attic. there is a giant welding torch in the corner."}
 
-#ì¥ì†Œ ë¬˜ì‚¬í•˜ê¸°
+#Àå¼Ò ¹¦»çÇÏ±â
 def describe_location (location, nodes):
     return nodes[location]
 
-#ê²½ë¡œ ë¬˜ì‚¬í•˜ê¸°
+#°æ·Î ¹¦»çÇÏ±â
 edges = {'living-room': (('garden', 'west', 'door'),
                          ('attic', 'upstairs', 'ladder')),
          'garden': (('living-room', 'east', 'door'), ),
@@ -16,12 +16,12 @@ edges = {'living-room': (('garden', 'west', 'door'),
 def describe_path (edge):
     return "there is a {0} going {1} from here.".format(edge[2], edge[1])
 
-#í•œ ë²ˆì— ì—¬ëŸ¬ ê²½ë¡œ ì •ì˜í•˜ê¸°
+#ÇÑ ¹ø¿¡ ¿©·¯ °æ·Î Á¤ÀÇÇÏ±â
 def describe_paths (location, edges):
     return " ".join(map(describe_path, edges[location]))
 
-#íŠ¹ì • ì¥ì†Œì˜ ë¬¼ê±´ ì„¤ëª…í•˜ê¸°
-#ëˆˆì— ë³´ì´ëŠ” ë¬¼ê±´ ë‚˜ì—´í•˜ê¸°
+#Æ¯Á¤ Àå¼ÒÀÇ ¹°°Ç ¼³¸íÇÏ±â
+#´«¿¡ º¸ÀÌ´Â ¹°°Ç ³ª¿­ÇÏ±â
 objects = ('whiskey', 'bucket', 'frog', 'chain')
 object_locations = {'whiskey': 'living-room',
                      'bucket': 'living-room',
@@ -33,13 +33,13 @@ def objects_at (loc, objs, obj_locs):
     return [obj for obj in objs if obj_locs[obj] == loc]
 
 
-#ëˆˆì— ë³´ì´ëŠ” ë¬¼ê±´ ë¬˜ì‚¬í•˜ê¸°
+#´«¿¡ º¸ÀÌ´Â ¹°°Ç ¹¦»çÇÏ±â
 def describe_objects (loc, objs, obj_loc):
     return " ".join(map(lambda obj:
                         "you see a {0} on the floor.".format(obj)
                         , objects_at(loc, objs, obj_loc)))
 
-#ì „ë¶€ ì¶œë ¥í•˜ê¸°
+#ÀüºÎ Ãâ·ÂÇÏ±â
 location = 'living-room'
 
 def look ():
@@ -49,7 +49,7 @@ def look ():
     retList.append(describe_objects (location, objects, object_locations))
     return " ".join(retList)
 
-#ê²Œì„ ì„¸ê³„ ë‘˜ëŸ¬ë³´ê¸°
+#°ÔÀÓ ¼¼°è µÑ·¯º¸±â
 def walk (direction):
     global location
     result = None
@@ -63,7 +63,7 @@ def walk (direction):
     else:
         return "you cannot go that way."
 
-#ë¬¼ê±´ ì§‘ê¸°
+#¹°°Ç Áı±â
 def pickup (object):
     if member(objects_at(location, objects, object_locations), object):
         object_locations[object] = 'body'
@@ -71,24 +71,24 @@ def pickup (object):
     else:
         return "you cannot get that."
 
-#ë³´ê´€í•¨ í™•ì¸í•˜ê¸°
+#º¸°üÇÔ È®ÀÎÇÏ±â
 def inventory ():
     return "items- " + " ".join(objects_at('body', objects, object_locations))
 
-#ê²Œì„ ì—”ì§„ì— ì§ì ‘ ë§Œë“  ì¸í„°í˜ì´ìŠ¤ ì¶”ê°€í•˜ê¸°
-#ì§ì ‘ ë§Œë“œëŠ” REPL
+#°ÔÀÓ¿¡ Á÷Á¢ ¸¸µç ÀÎÅÍÆäÀÌ½º Ãß°¡ÇÏ±â
+#Á÷Á¢ ¸¸µå´Â REPL
 def game_repl ():
     while True:
         print(eval(input()))
 
-#ì¢…ë£Œ ê¸°ëŠ¥ì„ ì¶”ê°€
+#
 def game_repl ():
     while True:
         cmd = game_read()
         if cmd == 'quit()': break
         print(game_eval(cmd))
 
-#read í•¨ìˆ˜ ì§ì ‘ ì‘ì„±í•˜ê¸°
+#read ÇÔ¼ö Á÷Á¢ ÀÛ¼ºÇÏ±â
 def game_read ():
     cmd = input().split(' ', 1)
     if len(cmd) == 2:
@@ -96,7 +96,7 @@ def game_read ():
     else:
         return "{0}()".format(cmd[0])
 
-#game-eval í•¨ìˆ˜ ì‘ì„±í•˜ê¸°
+#game-eval ÇÔ¼ö ÀÛ¼ºÇÏ±â
 allowed_commands = ['look', 'walk', 'pickup', 'inventory']
 
 def game_eval (sexp):
@@ -105,9 +105,9 @@ def game_eval (sexp):
     else:
         return "I do not know that command."
 
-#game-print í•¨ìˆ˜ ì‘ì„±í•˜ê¸°
+#game-print ÇÔ¼ö ÀÛ¼ºÇÏ±â
 
-#ìš”ì†Œì¸ì¹˜ ê²€ì‚¬í•˜ëŠ” í•¨ìˆ˜
+#¸É¹öÀÎÁö È®ÀÎÇÏ´Â ÇÔ¼ö
 def member (list, value):
     for item in list:
         if item == value:

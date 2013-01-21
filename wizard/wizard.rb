@@ -92,11 +92,11 @@ end
 
 #게임 엔진에 직접 만든 인테페이스 추가하기
 #직접 만드는 REPL
-def game_repl ()
-  while true do
-    puts eval(gets)
-  end
-end
+#def game_repl ()
+#  while true do
+#    puts eval(gets)
+#  end
+#end
 
 #종료 기능을 추가
 def game_repl ()
