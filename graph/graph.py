@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import re
 import sys
 import subprocess
@@ -13,7 +15,7 @@ wizard_edges = {'living-room': (('garden', 'west', 'door'),
                 'attic': (('living-room', 'downstairs', 'ladder'), )}
 
 #그래프 생성하기
-#DOT 정보 새성하기
+#DOT 정보 생성하기
 #노드 식별자 변환하기
 def dot_name (exp):
     return re.sub("\W", "_", exp)
@@ -71,5 +73,33 @@ def graph_to_png (fname, nodes, edges):
     dot_to_png(fname, lambda:
                graph_to_dot(nodes, edges))
 
+#무향 그래프 생성하기
+def uedges_to_dot (edges):
+    lst = list(edges.keys())
+    while len(lst) > 0:
+        key = lst.pop(0)
+        for edge in edges[key]:
+            if not member(lst, edge[0]):
+                sys.stdout.write(dot_name(key))
+                sys.stdout.write("--")
+                sys.stdout.write(dot_name(edge[0]))
+                sys.stdout.write("[label=\"")
+                sys.stdout.write(dot_label(" ".join(edge[1:])))
+                print("\"];");
 
-    
+def ugraph_to_dot (nodes, edges):
+    sys.stdout.write("graph{")
+    nodes_to_dot(nodes)
+    uedges_to_dot(edges)
+    print("}")
+
+def ugraph_to_png (fname, nodes, edges):
+    dot_to_png(fname, lambda:
+               ugraph_to_dot(nodes, edges))
+
+#맴버인지 확인하는 함수
+def member (list, value):
+    for item in list:
+        if item == value:
+            return True
+    return False
