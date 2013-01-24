@@ -32,8 +32,9 @@ Java와 C는 정의하는데 좀 손이 많이 간다.
 동적 메모리를 할당하여 char * 형으로 반환하였다.
 </p>
 
-<li>Lisp</li>
-<pre><code>;관련 풍경 묘사하기
+-Lisp
+```lisp
+;관련 풍경 묘사하기
 (defparameter *nodes* '((living-room (you are in the living-room.
 				      a wizard is snoring loudly on the couch.))
 			 (garden (you are in a beautiful garden.
@@ -44,9 +45,13 @@ Java와 C는 정의하는데 좀 손이 많이 간다.
 ;장소 묘사하기
 (defun describe-location (location nodes)
   (cadr (assoc location nodes)))
-</code></pre>
+```
 
-lisp는 괄호만을 이용해서 쉽게 List를 정의할 수 있다. 또한, 심볼에 제약이 적어 심볼만으로도 자연스러운 문장을 작성 할 수 있디ㅏ.
+
+>lisp는 괄호만을 이용해서 쉽게 List를 정의할 수 있다. 또한, 심볼에 제약이 적어 심볼만으로도 자연스러운 문장을 작성 할 수 있다.
+>콘드는 설명을 심볼로 작성하는 장점을 몇가지 제안 했지만 개인적으로는 문자열로 취급하는것이 더 맞다고 생각한다.
+>일단 설명은 다국어도 가능해야 하기 때문에 심볼은 올바른 선택이 아닌 듯 하다.
+
 
 
 
