@@ -7,7 +7,7 @@ description: Text 어드벤처게임 Wizard
 ###관련 풍경 묘사하기
 
 <p>
-우선 노드를 정의한다. 가능한 해시또는 리스트 구조를 이용해서 정의한다.
+우선 노드를 정의한다. 노드는 장소와 설명으로 구성되어 있다.
 </p>
 
 <p>
@@ -45,6 +45,10 @@ Java와 C는 정의하는데 좀 손이 많이 간다.
 (defun describe-location (location nodes)
   (cadr (assoc location nodes)))
 </code></pre>
+
+lisp는 괄호만을 이용해서 쉽게 List를 정의할 수 있다. 또한, 심볼에 제약이 적어 심볼만으로도 자연스러운 문장을 작성 할 수 있디ㅏ.
+
+
 
 <li>Ruby</li>
 <pre><code>#관련 풍경 묘사하기
