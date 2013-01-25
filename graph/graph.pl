@@ -1,3 +1,5 @@
+use List::Util qw/first/;
+
 #그래프 표현하기
 %wizard_nodes = ("living-room" => "You are in the living-room. A wizard is snoring loudly on the courch.",
 		  garden => "You are in a beautiful garden. There is a well in front of you.",
@@ -55,9 +57,68 @@ sub edges_to_dot {
     }
 }
 
-#print &dot_name("foo!");
-#print &dot_label("1234567890ABCDEFGHIJKLMNOPWEWEDWE");
-#&nodes_to_dot(%wizard_nodes);
-&edges_to_dot(%wizard_edges);
+#모든 DOT 데이터 생성하기
+sub graph_to_dot {
+    my %nodes = %{$_[0]};
+    my %edges = %{$_[1]};
+    print "digraph{\n";
+    &nodes_to_dot(%nodes);
+    &edges_to_dot(%edges);
+    print "}";
+}
 
-#print $wizard_nodes{"living-room"};
+#DOT 파일을 그림으로 바꾸기
+sub dot_to_png {
+    my ($fname, $thunk, $nodes, $edges) = @_;
+    open FILE, ">", $fname;
+    select FILE;
+    &{$thunk}($nodes, $edges);
+    select STDOUT;
+    close FILE;
+    system("dot -Tpng -O $fname");
+}
+
+#명령창 결과 전송하기
+
+#그래프를 그림으로 만들기
+sub graph_to_png {
+    my $fname = $_[0];
+    my %nodes = %{$_[1]};
+    my %edges = %{$_[2]};
+    &dot_to_png($fname, \&graph_to_dot, \%nodes, \%edges);
+}
+
+#무향 그래프 생성하기
+sub uedges_to_dot {
+    my %edges = @_;
+    my @lst = keys %edges;
+    while ($#lst >= 0) {
+	my $key = shift(@lst);
+	for my $edge (@{$edges{$key}}) {
+	    unless (first { $_ eq $edge->[0] } @lst) {
+		print dot_name($key);
+		print "--";
+		print dot_name($edge->[0]);
+		print "[label=\"";
+		print dot_label(join " ", @{$edge}[1, -1]);
+		print "\"];\n";
+	    }
+	}
+    }
+}
+
+sub ugraph_to_dot {
+    my %nodes = %{$_[0]};
+    my %edges = %{$_[1]};
+    print "graph{\n";
+    &nodes_to_dot(%nodes);
+    &uedges_to_dot(%edges);
+    print "}";
+}
+
+sub ugraph_to_png {
+    my $fname = $_[0];
+    my %nodes = %{$_[1]};
+    my %edges = %{$_[2]};
+    &dot_to_png($fname, \&ugraph_to_dot, \%nodes, \%edges);
+}
