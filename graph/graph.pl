@@ -69,10 +69,10 @@ sub graph_to_dot {
 
 #DOT 파일을 그림으로 바꾸기
 sub dot_to_png {
-    my ($fname, $thunk, $nodes, $edges) = @_;
+    my ($fname, $thunk) = @_;
     open FILE, ">", $fname;
     select FILE;
-    &{$thunk}($nodes, $edges);
+    $thunk->();
     select STDOUT;
     close FILE;
     system("dot -Tpng -O $fname");
@@ -85,7 +85,9 @@ sub graph_to_png {
     my $fname = $_[0];
     my %nodes = %{$_[1]};
     my %edges = %{$_[2]};
-    &dot_to_png($fname, \&graph_to_dot, \%nodes, \%edges);
+    &dot_to_png($fname, sub {
+	graph_to_dot(\%nodes, \%edges);
+    });
 }
 
 #무향 그래프 생성하기
@@ -120,5 +122,17 @@ sub ugraph_to_png {
     my $fname = $_[0];
     my %nodes = %{$_[1]};
     my %edges = %{$_[2]};
-    &dot_to_png($fname, \&ugraph_to_dot, \%nodes, \%edges);
+    &dot_to_png($fname, sub {
+	ugraph_to_dot(\%nodes, \%edges);
+    });
+}
+
+#그래프를 그림으로 만들기
+sub ttt {
+    my $fname = $_[0];
+    my %nodes = %{$_[1]};
+    my %edges = %{$_[2]};
+    &dot_to_png($fname, sub {
+	graph_to_dot(\%nodes, \%edges);
+    });
 }
