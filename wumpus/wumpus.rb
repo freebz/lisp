@@ -75,5 +75,18 @@ def connect_with_bridges (islands)
 end
 
 def connect_all_islands (nodes, edge_list)
-  connect_with_bridges(find_islands nodes, edge_list).push(edge_list)
+  connect_with_bridges(find_islands nodes, edge_list) + edge_list
 end
+
+#'베베 꼬인 도시'의 마지막 에지 만들기
+def make_city_edges
+  nodes = [1..$node_num]
+  edge_list = connect_all_islands nodes, make_edge_list
+  coops = edge_list.select{
+    rand($cop_odds) == 0
+  }
+  add_cops (edges_to_alist edge_list), cops
+end
+
+def edges_to_alist (edge_list)
+  
