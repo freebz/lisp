@@ -39,15 +39,41 @@ def get_connected (node, edge_list)
   @visited = []
   @edge_list = edge_list
   def traverse (node)
-#    @visited.push(node)
     unless @visited.include?(node) then
       @visited.push(node);
-      direct_edges node, edge_list
-#      (direct_edges node, edge_list).each do |edge|
-        #traverse edge[0][1]
-#      end
+      (direct_edges node, @edge_list).each do |edge|
+        traverse edge[0][1]
+      end
     end
   end
   traverse node
   @visited
+end
+
+def find_islands (nodes, edge_list)
+  @islands = []
+  @edge_list = edge_list
+  def find_island (nodes)
+    connected = get_connected nodes[0], @edge_list
+    unconnected = nodes - connected
+    connected.push(@islands)
+    unless unconnected.empty? then
+      find_island unconnected
+    end
+  end
+  find_island nodes
+  @islands
+end
+
+def connect_with_bridges (islands)
+  ret = []
+  if islands[1] then
+    ret.push(edge_pair islands[0][0][0], islands[1][0][0])
+    connect_with_bridges islands[1..-1]
+  end
+  ret
+end
+
+def connect_all_islands (nodes, edge_list)
+  connect_with_bridges(find_islands nodes, edge_list).push(edge_list)
 end
