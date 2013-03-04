@@ -23,7 +23,7 @@ end
 def make_edge_list
   $edge_num.times.map {
     edge_pair random_node, random_node
-  }.select{|edge| edge != nil}
+  }.compact.flatten(1)
 end
 
 #loop 명령어로 반복문 만들기
@@ -31,7 +31,7 @@ end
 #섬으로 고립되는 것 방지하기
 def direct_edges (node, edge_list)
   edge_list.select { |x|
-    x[0][0] == node
+    x[0] == node
   }
 end
     
