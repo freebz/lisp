@@ -42,7 +42,7 @@ def get_connected (node, edge_list)
     unless @visited.include?(node) then
       @visited.push(node);
       (direct_edges node, @edge_list).each do |edge|
-        traverse edge[0][1]
+        traverse edge[1]
       end
     end
   end
@@ -56,7 +56,7 @@ def find_islands (nodes, edge_list)
   def find_island (nodes)
     connected = get_connected nodes[0], @edge_list
     unconnected = nodes - connected
-    connected.push(@islands)
+    @islands.push(connected)
     unless unconnected.empty? then
       find_island unconnected
     end
@@ -68,10 +68,10 @@ end
 def connect_with_bridges (islands)
   ret = []
   if islands[1] then
-    ret.push(edge_pair islands[0][0][0], islands[1][0][0])
+    ret.push(edge_pair islands[0][0], islands[1][0])
     connect_with_bridges islands[1..-1]
   end
-  ret
+  ret.flatten(1)
 end
 
 def connect_all_islands (nodes, edge_list)
@@ -82,11 +82,49 @@ end
 def make_city_edges
   nodes = [1..$node_num]
   edge_list = connect_all_islands nodes, make_edge_list
-  coops = edge_list.select{
+  cops = edge_list.select{
     rand($cop_odds) == 0
   }
   add_cops (edges_to_alist edge_list), cops
 end
 
 def edges_to_alist (edge_list)
-  
+  edge_list.map{|edge|
+    edge[0]
+  }.uniq.map{|node1|
+    [node1] + 
+    (direct_edges node1, edge_list).uniq.map{|edge|
+      [edge[1]]
+    }
+  }
+end
+
+def add_cops (edge_alist, edges_with_cops)
+  edge_alist.map{|x|
+    node1 = x[0]
+    node1_edges = x[1..-1]
+    [node1] +
+    node1_edges.map{|edge|
+      node2 = edge[0]
+      unless ((edge_pair node1, node2) & edges_with_cops).empty? then
+        [node2, :cops]
+      else
+        edge
+      end
+    }
+  }
+end
+
+#'배배 꼬인 도시'의 노드 생성하기
+def neighbors (node, edge_alist)
+  edge_alist.detect{|edge|
+    edge[0] == node
+  }[1..-1].map{|edge|
+    edge[0]
+  }
+end
+
+def within_one (a, b, edge_alist)
+  (neighbors a, edge_alist).include?(b)
+end
+
