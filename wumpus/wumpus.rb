@@ -128,3 +128,9 @@ def within_one (a, b, edge_alist)
   (neighbors a, edge_alist).include?(b)
 end
 
+def within_two (a, b, edge_alist)
+  within_one a, b, edge_alist ||
+    (neighbors a, edge_alist).map{|x|
+    within_one x, b, edge_alist
+  }.include?(true)
+end
