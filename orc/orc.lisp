@@ -127,3 +127,64 @@
 	 *monsters*)))
 
 
+;몬스터
+;제네릭 몬스터
+(defstruct monster (health (randval 10)))
+
+(defmethod monster-hit (m x)
+  (decf (monster-health m) x)
+  (if (monster-dead m)
+      (progn (princ "You killed the ")
+	     (princ (type-of m))
+	     (princ "! "))
+      (progn (princ "You hit the ")
+	     (princ (type-of m))
+	     (princ ", knocking off ")
+	     (princ x)
+	     (princ " health points! "))))
+
+(defmethod monster-show (m)
+  (princ "A fierce ")
+  (princ (type-of m)))
+
+(defmethod monster-attack (m))
+
+;사악한 오크
+(defstruct (orc (:include monster)) (club-level (randval 8)))
+(push #'mack-orc *monster-builders*)
+
+(defmethod monster-show ((m orc))
+  (princ "A wicked orc with a level ")
+  (princ (orc-club-level m))
+  (princ " club"))
+
+(defmethod monster-attack ((m orc))
+  (let ((x (randval (orc-club-level m))))
+    (princ "An orc swing his club at you and knocks off ")
+    (princ x)
+    (princ " of your health points. ")
+    (decf *player-health* x)))
+
+
+;악랄한 히드라
+(defstruct (hydra (:include monster)))
+(push #'make-hydra *monster-builders*)
+
+(defmathod monster-show ((m hydra))
+  (princ "A malicious hydra with ")
+  (princ (monster-health m))
+  (princ " heads."))
+
+(defmethod monster-hit ((m hydra) x)
+  (decf (monster-health m) x)
+  (if (monster-dead m)
+      (princ "The corpse of the fully decapitated and decapacitated hydra falls to the floor!")
+      (progn (princ "You lop off ")
+	     (princ x)
+	     (princ " of the hydra's heads! "))))
+
+(defmethod monster-attack ((m hydra))
+  (let ((x randval (ash (monster-health m) -1))))
+  (princ "A hydra attacks you with ")
+  (princ x)
+  (princ " of 
