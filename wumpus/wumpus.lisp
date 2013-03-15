@@ -11,7 +11,6 @@
 (defparameter *worm-num* 3)
 (defparameter *cop-odds* 15)
 
-
 ;무작위로 에지 생성하기
 (defun random-node ()
   (1+ (random *node-num*)))
