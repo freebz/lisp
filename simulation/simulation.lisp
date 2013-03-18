@@ -97,7 +97,7 @@
 	*animals*)
   (add-plants))
 
-;게임 세계rmflrl
+;게임 세계 그리기
 (defun draw-world ()
   (loop for y
        below *height*
@@ -123,9 +123,9 @@
 	  (t (let ((x (parse-integer str :junk-allowed t)))
 	       (if x
 		   (loop for i
-			below x
-			do (update-world)
-			if (zerop (mod i 1000))
-			do (princ #\.))
+		      below x
+		      do (update-world)
+		      if (zerop (mod i 1000))
+		      do (princ #\.))
 		   (update-world))
 	       (evolution))))))
