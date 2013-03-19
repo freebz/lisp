@@ -51,7 +51,7 @@
 
 ;요청의 본문 해석하기
 (defun get-content-params (stream header)
-  (let ((length (cdr (asoc 'content-length header))))
+  (let ((length (cdr (assoc 'content-length header))))
     (when length
       (let ((content (make-string (parse-integer length))))
 	(read-sequence content stream)
@@ -68,5 +68,14 @@
 			(params (append (cdr url)
 					(get-content-params stream header)))
 			(*standard-output* stream))
-		   (funcall request-handler path header params)))))
-    (socket-server-close socket))))
+		   (funcall request-handler path header params))))
+      (socket-server-close socket))))
+
+;동적 웹 사이트 만들기
+(defun hello-request-handler (path header params)
+  (if (equal path "greeting")
+      (let ((name (assoc 'name params)))
+	(if (not name)
+	    (princ "<html><form>What is your name?<input name='name' /></form></html>")
+	    (format t "<html>Nice to meet you, ~a!</html>" (cdr name))))
+      (princ "Sorry... I don't know that page.")))
