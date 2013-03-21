@@ -158,3 +158,17 @@
 	(format t "The game is a tie between ~a" (mapcar #'player-letter w))
 	(format t "The winner is ~a" (player-letter (car w))))))
 
+;지능을 갖춘 적 만들기
+
+;미니맥스 알고리즘을 실제 코드로 구현하기
+(defun rate-position (tree player)
+  (let ((moves (caddr tree)))
+    (if moves
+	(apply (if (eq (car tree) player)
+		   #'max
+		   #'min)
+	       (get-ratings tree player))
+	(let ((w (winners (cadr tree))))
+	  (if (member player w)
+	      (/ 1 (length w))
+	      0)))))
