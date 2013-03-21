@@ -105,3 +105,56 @@
     (board-array (f (coerce board 'list) spare-dice))))
 
 ;새로운 game-tree 함수 사용하기
+;(game-tree #((0 1)(1 1)(0 2)(1 1)) 0 0 t)
+
+;다른 사람과 맞붙기
+
+;주 반복문
+(defun play-vs-human (tree)
+  (print-info tree)
+  (if (caddr tree)
+      (play-vs-human (handle-human tree))
+      (announce-winner (cadr tree))))
+
+;게임의 상태 정보
+(defun print-info (tree)
+  (fresh-line)
+  (format t "current player = ~a" (player-letter (car tree)))
+  (draw-board (cadr tree)))
+
+;사람의 입력값 처리하기
+(defun handle-human (tree)
+  (fresh-line)
+  (princ "choose your move:")
+  (let ((moves (caddr tree)))
+    (loop for move in moves
+	 for n from 1
+	 do (let ((action (car move)))
+	      (fresh-line)
+	      (format t "~a. " n)
+	      (if action
+		  (format t "~a -> ~a" (car action) (cadr action))
+		  (princ "end turn"))))
+    (fresh-line)
+    (cadr (nth (1- (read)) moves))))
+
+;승자 가리기
+(defun winners (board)
+  (let* ((tally (loop for hex across board
+		     collect (car hex)))
+	 (totals (mapcar (lambda (player)
+			   (cons player (count player tally)))
+			 (remove-duplicates tally)))
+	 (best (apply #'max (mapcar #'cdr totals))))
+    (mapcar #'car
+	    (remove-if (lambda (x)
+			 (not (eq (cdr x) best)))
+		       totals))))
+
+(defun announce-winner (board)
+  (fresh-line)
+  (let ((w (winners board)))
+    (if (> (length w) 1)
+	(format t "The game is a tie between ~a" (mapcar #'player-letter w))
+	(format t "The winner is ~a" (player-letter (car w))))))
+
