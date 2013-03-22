@@ -46,13 +46,13 @@ def add_passing_move board, player, spare_dice, first_move, moves
   if first_move
     moves
   else
-    ret = []
-    ret.push(nil)
-    ret.push(game_tree (add_new_dice board, player, spare_dice -1),
-             (player +1) % $num_players,
-             0,
-             true)
-    ret + moves
+    pass = []
+    pass.push(nil)
+    pass.push(game_tree (add_new_dice board, player, spare_dice -1),
+              (player +1) % $num_players,
+              0,
+              true)
+    [pass] + moves
   end
 end
 
@@ -143,17 +143,16 @@ end
 #주 반복문
 def play_vs_human tree
   print_info tree
-  if tree[2][0]
+  unless tree[2].empty?
     play_vs_human (handle_human tree)
   else
-    announce_winner tree[1][0]
+    announce_winner tree[1]
   end
 end
 
 #게임의 상태 정보
 def print_info tree
   puts
-  print tree[0]
   printf "current player = %s", (player_letter tree[0])
   draw_board tree[1]
 end
