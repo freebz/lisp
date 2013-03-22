@@ -172,3 +172,20 @@
 	  (if (member player w)
 	      (/ 1 (length w))
 	      0)))))
+
+(defun get-ratings (tree player)
+  (mapcar (lambda (move)
+	    (rate-position (cadr move) player))
+	  (caddr tree)))
+
+;인공지능 플레이어와 함께 하는 게임 반복문 만들기
+(defun  handle-computer (tree)
+  (let ((ratings (get-ratings tree (car tree))))
+    (cadr (nth (position (apply #'max ratings) ratings) (caddr tree)))))
+
+(defun play-vs-computer (tree)
+  (print-info tree)
+  (cond ((null (caddr tree)) (announce-winner (cadr tree)))
+	((zerop (car tree)) (play-vs-computer (handle-human tree)))
+	(t (play-vs-computer (handle-computer tree)))))
+
