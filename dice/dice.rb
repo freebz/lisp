@@ -206,7 +206,7 @@ end
 
 #미니맥스 알고리즘을 실제 코드로 구현하기
 def rate_position tree, player
-  moves = tree[2];
+  moves = tree[2]
   unless moves.empty?
     ratings = (get_ratings tree, player)
     if tree[0] == player
@@ -247,3 +247,76 @@ def play_vs_computer tree
     play_vs_computer (handle_computer tree)
   end
 end
+
+
+
+#운명의 주사위 게임 속도 개선하기
+
+#메모이제이션
+
+#neighbors 함수 메모이제이션하기
+begin
+  @old_neighbors = method(:neighbors)
+  @previous_neighbors = Hash.new
+  def neighbors pos
+    @previous_neighbors[pos] or @previous_neighbors[pos] = (@old_neighbors.call pos)
+  end
+end
+
+
+#게임 트리 메모이제이션
+begin
+  @old_game_tree = method(:game_tree)
+  @previous_game_tree = Hash.new
+  def game_tree *rest
+    @previous_game_tree[rest] or @previous_game_tree[rest] = (@old_game_tree.call *rest)
+  end
+end
+
+#rate_position 함수 메모이제이션
+begin
+  @old_rate_position = method(:rate_position)
+  @previous_rate_position = Hash.new
+  def rate_position tree, player
+    tab = @previous_rate_position[player]
+    unless tab
+      tab = Hash[player, Hash.new]
+    end
+    tab[tree] or tab[tree] = (@old_rate_position.call tree, player)
+  end
+end
+      
+
+
+#꼬리 호출 최적화
+
+#운명의 주사위 게임에서 꼬리 호출 최적화하기
+
+#루비 1.9 이상에서 꼬리 호출 지원하기
+RubyVM::InstructionSequence.compile_option = {
+  :tailcall_optimization => true,
+  :trace_instruction => false
+}
+
+def add_new_dice board, player, spare_dice
+  @player = player
+  def f lst, n, acc
+    case
+    when n== 0
+      acc + lst
+    when lst.empty?
+      acc
+    else
+      cur_player = lst[0][0]
+      cur_dice = lst[0][1]
+      if cur_player == @player and cur_dice < $max_dice
+        f lst[1..-1], n -1, acc.push([cur_player, cur_dice +1])
+      else
+        f lst[1..-1], n, acc.push(lst[0])
+      end
+    end
+  end
+  f board, spare_dice, []
+end
+
+

@@ -3,7 +3,7 @@
 ;전역변수 선언하기
 (defparameter *num-players* 2)
 (defparameter *max-dice* 3)
-(defparameter *board-size* 3)
+(defparameter *board-size* 2)
 (defparameter *board-hexnum* (* *board-size* *board-size*))
 
 ;게임판 구현하기
@@ -209,7 +209,7 @@
     (or (gethash rest previous)
 	(setf (gethash rest previous) (apply old-game-tree rest)))))
 
-;reat-position 함수 메모이제이션
+;rate-position 함수 메모이제이션
 (let ((old-rate-position (symbol-function 'rate-position))
       (previous (make-hash-table)))
   (defun rate-position (tree player)
@@ -238,3 +238,6 @@
 			    (f (cdr lst) n (cons (car lst) acc))))))))
     (board-array (f (coerce board 'list) spare-dice ()))))
 
+
+;커먼 리스프에서 꼬리 호출 지원하기
+(compile 'add-new-dice)
