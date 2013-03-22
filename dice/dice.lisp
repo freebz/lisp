@@ -3,7 +3,7 @@
 ;전역변수 선언하기
 (defparameter *num-players* 2)
 (defparameter *max-dice* 3)
-(defparameter *board-size* 2)
+(defparameter *board-size* 3)
 (defparameter *board-hexnum* (* *board-size* *board-size*))
 
 ;게임판 구현하기
@@ -188,4 +188,53 @@
   (cond ((null (caddr tree)) (announce-winner (cadr tree)))
 	((zerop (car tree)) (play-vs-computer (handle-human tree)))
 	(t (play-vs-computer (handle-computer tree)))))
+
+
+
+;운명의 주사위 게임 속도 개선하기
+
+;메모이제이션
+
+;neighbors 함수 메모이제이션하기
+(let ((old-neighbors (symbol-function 'neighbors))
+      (previous (make-hash-table)))
+  (defun neighbors (pos)
+    (or (gethash pos previous)
+	(setf (gethash pos previous) (funcall old-neighbors pos)))))
+
+;게임 트리 메모이제이션
+(let ((old-game-tree (symbol-function 'game-tree))
+      (previous (make-hash-table :test #'equalp)))
+  (defun game-tree (&rest rest)
+    (or (gethash rest previous)
+	(setf (gethash rest previous) (apply old-game-tree rest)))))
+
+;reat-position 함수 메모이제이션
+(let ((old-rate-position (symbol-function 'rate-position))
+      (previous (make-hash-table)))
+  (defun rate-position (tree player)
+    (let ((tab (gethash player previous)))
+      (unless tab
+	(setf tab (setf (gethash player previous) (make-hash-table))))
+      (or (gethash tree tab)
+	  (setf (gethash tree tab)
+		(funcall old-rate-position tree player))))))
+
+
+;꼬리 호출 최적화
+
+;운명의 주사위 게임에서 꼬리 호출 최적화하기
+(defun add-new-dice (board player spare-dice)
+  (labels ((f (lst n acc)
+	     (cond ((zerop n) (append (reverse acc) lst))
+		   ((null lst) (reverse acc))
+		   (t (let ((cur-player (caar lst))
+			    (cur-dice (cadar lst)))
+			(if (and (eq cur-player player)
+				 (< cur-dice *max-dice*))
+			    (f (cdr lst)
+			       (1- n)
+			       (cons (list cur-player (1+ cur-dice)) acc))
+			    (f (cdr lst) n (cons (car lst) acc))))))))
+    (board-array (f (coerce board 'list) spare-dice ()))))
 
