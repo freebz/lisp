@@ -179,7 +179,7 @@
 	  (caddr tree)))
 
 ;인공지능 플레이어와 함께 하는 게임 반복문 만들기
-(defun  handle-computer (tree)
+(defun handle-computer (tree)
   (let ((ratings (get-ratings tree (car tree))))
     (cadr (nth (position (apply #'max ratings) ratings) (caddr tree)))))
 

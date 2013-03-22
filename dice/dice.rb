@@ -201,3 +201,49 @@ def announce_winner board
     printf "The winner is %s\n", (player_letter w[0])
   end
 end
+
+#지능을 갖춘 적 만들기
+
+#미니맥스 알고리즘을 실제 코드로 구현하기
+def rate_position tree, player
+  moves = tree[2];
+  unless moves.empty?
+    ratings = (get_ratings tree, player)
+    if tree[0] == player
+      ratings.max
+    else
+      ratings.min
+    end
+  else
+    w = winners tree[1]
+    if w.include?(player)
+      1.0 / w.length
+    else
+      0
+    end
+  end
+end
+
+def get_ratings tree, player
+  tree[2].map{|move|
+    rate_position move[1], player
+  }
+end
+
+#인공지능 플레이어와 함께 하는 게임 반복문 만들기
+def handle_computer tree
+  ratings = get_ratings tree, tree[0]
+  tree[2][ratings.each_with_index.max[1]][1]
+end
+
+def play_vs_computer tree
+  print_info tree
+  case
+  when tree[2].empty?
+    announce_winner tree[1]
+  when tree[0] == 0
+    play_vs_computer (handle_human tree)
+  else
+    play_vs_computer (handle_computer tree)
+  end
+end
