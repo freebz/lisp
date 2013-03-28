@@ -185,4 +185,4 @@
 (defparameter *board-size* 5)
 (defparameter *board-hexnum* (* *board-size* *board-size*))
 
-(play-vs-computer (game-tree (gen-board) 0 0 t))
+;(play-vs-computer (game-tree (gen-board) 0 0 t))
