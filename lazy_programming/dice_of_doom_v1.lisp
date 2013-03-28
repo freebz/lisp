@@ -7,6 +7,7 @@
 (defparameter *max-dice* 3)
 (defparameter *board-size* 4)
 (defparameter *board-hexnum* (* *board-size* *board-size*))
+(defparameter *ai-level* 4)
 
 ;게임판 구현하기
 (defun board-array (lst)
@@ -19,6 +20,7 @@
 
 (defun player-letter (n)
   (code-char (+ 97 n)))
+
 
 (defun draw-board (board)
   (loop for y below *board-size*
@@ -104,6 +106,7 @@
 				(t hex)))))
 
 ;병력 충원하기
+#|
 (defun add-new-dice (board player spare-dice)
   (labels ((f (lst n)
 	     (cond ((null lst) nil)
@@ -115,6 +118,7 @@
 				  (f (cdr lst) (1- n)))
 			    (cons (car lst) (f (cdr lst) n))))))))
     (board-array (f (coerce board 'list) spare-dice))))
+|#
 
 ;새로운 game-tree 함수 사용하기
 ;(game-tree #((0 1)(1 1)(0 2)(1 1)) 0 0 t)
@@ -178,29 +182,28 @@
 ;미니맥스 알고리즘을 실제 코드로 구현하기
 (defun rate-position (tree player)
   (let ((moves (caddr tree)))
-    (if moves
+    (if (not (lazy-null moves))
 	(apply (if (eq (car tree) player)
 		   #'max
 		   #'min)
 	       (get-ratings tree player))
-	(let ((w (winners (cadr tree))))
-	  (if (member player w)
-	      (/ 1 (length w))
-	      0)))))
+	(score-board (cdar tree) player))))
 
 (defun get-ratings (tree player)
-  (mapcar (lambda (move)
-	    (rate-position (cadr move) player))
-	  (caddr tree)))
+  (take-all (lazy-mapcar (lambda (move)
+			   (rate-position (cadr move) player))
+			 (caddr tree))))
 
 ;인공지능 플레이어와 함께 하는 게임 반복문 만들기
 (defun handle-computer (tree)
-  (let ((ratings (get-ratings tree (car tree))))
-    (cadr (nth (position (apply #'max ratings) ratings) (caddr tree)))))
+  (let ((ratings (get-ratings (limit-tree-depth tree *ai-level*) 
+			      (car tree))))
+    (cadr (lazy-nth (position (apply #'max ratings) ratings)
+		    (caddr tree)))))
 
 (defun play-vs-computer (tree)
   (print-info tree)
-  (cond ((null (caddr tree)) (announce-winner (cadr tree)))
+  (cond ((lazy-null (caddr tree)) (announce-winner (cadr tree)))
 	((zerop (car tree)) (play-vs-computer (handle-human tree)))
 	(t (play-vs-computer (handle-computer tree)))))
 
@@ -211,6 +214,7 @@
 ;메모이제이션
 
 ;neighbors 함수 메모이제이션하기
+#|
 (let ((old-neighbors (symbol-function 'neighbors))
       (previous (make-hash-table)))
   (defun neighbors (pos)
@@ -234,6 +238,7 @@
       (or (gethash tree tab)
 	  (setf (gethash tree tab)
 		(funcall old-rate-position tree player))))))
+|#
 
 
 ;꼬리 호출 최적화
@@ -256,3 +261,43 @@
 
 ;커먼 리스프에서 꼬리 호출 지원하기
 (compile 'add-new-dice)
+
+
+
+;더 큰 게임판에서 인공지능 플레이어 작동시키기
+
+;게임 트리 다듬기
+(defun limit-tree-depth (tree depth)
+  (list (car tree)
+	(cadr tree)
+	(if (zerop depth)
+	    (lazy-nil)
+	    (lazy-mapcar (lambda (move)
+			   (list (car move)
+				 (limit-tree-depth (cadr move) (1- depth))))
+			 (caddr tree)))))
+
+
+;휴리스틱 적용하기
+
+;큰 차이로 이기는가 vs 작은 차이로 이기는가
+(defun score-board (board player)
+  (loop for hex across board
+       for pos from 0
+       sum (if (eq (car hex) player)
+	       (if (threatened pos board)
+		   1
+		   2)
+	       -1)))
+
+;위협받고 있는 육면체인지 확인
+(defun threatened (pos board)
+  (let* ((hex (aref board pos))
+	 (player (car hex))
+	 (dice (cadr hex)))
+    (loop for n in (neighbors pos)
+	 do (let* ((nhex (aref board n))
+		   (nplayer (car nhex))
+		   (ndice (cadr nhex)))
+	      (when (and (not (eq player nplayer)) (> ndice dice))
+		(return t))))))
