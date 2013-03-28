@@ -83,7 +83,7 @@
      (make-lazy (loop for n below *board-hexnum*
 		   collect n)))))
 
-;인접 영역 찾기
+					;인접 영역 찾기
 (defun neighbors (pos)
   (let ((up (- pos *board-size*))
 	(down (+ pos *board-size*)))
